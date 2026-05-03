@@ -58,6 +58,7 @@
 template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
     float *B, int wA,
     int wB) {
+  // template 表示BLOCK_SIZE是一个模板参数，在编译时会被替换为实际的值
   // Block index
   int bx = blockIdx.x;
   int by = blockIdx.y;
@@ -93,6 +94,8 @@ template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
     // Declaration of the shared memory array As used to
     // store the sub-matrix of A
     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+    // __shared__表示共享内存
+    // 同一个 block 内的所有线程都能访问它，比全局内存要快很多
 
     // Declaration of the shared memory array Bs used to
     // store the sub-matrix of B
@@ -106,6 +109,8 @@ template <int BLOCK_SIZE> __global__ void MatrixMulCUDA(float *C, float *A,
 
     // Synchronize to make sure the matrices are loaded
     __syncthreads();
+    // 线程同步
+    // block 内所有线程都必须走到这里,等大家都把 As 和 Bs 填完，再继续往下执行
 
     // Multiply the two matrices together;
     // each thread computes one element
@@ -142,6 +147,7 @@ int MatrixMultiply(int argc, char **argv,
                    const dim3 &dimsB) {
   // Allocate host memory for matrices A and B
   unsigned int size_A = dimsA.x * dimsA.y;
+  // unsigned 是无符号整数 表示该变量只能存非负数
   unsigned int mem_size_A = sizeof(float) * size_A;
   float *h_A;
   checkCudaErrors(cudaMallocHost(&h_A, mem_size_A));

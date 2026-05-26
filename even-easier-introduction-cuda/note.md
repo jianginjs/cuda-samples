@@ -61,6 +61,8 @@ void add(int n, float *x, float *y)
   int index = blockIdx.x * blockDim.x + threadIdx.x;
   int stride = blockDim.x * gridDim.x;
   for (int i = index; i < n; i += stride)
+  // 每个线程从自己的 index 开始，每隔 stride 处理一个元素
+  // 这个for 循环是每个线程独立循环
     y[i] = x[i] + y[i];
 }
 ```
